@@ -1,0 +1,62 @@
+<html>
+
+<head>
+
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.1/dist/browser-image-compression.js">
+        </script>
+    <script>
+        async function printImage(image, divId) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById(divId).setAttribute('src', e.target.result);
+            }
+            reader.readAsDataURL(image);
+        }
+
+        async function handleImageUpload(event) {
+
+            const imageFile = event.target.files[0];
+            printImage(imageFile, 'original');
+            console.log('originalFile instanceof Blob', imageFile instanceof Blob); // true
+            console.log(`originalFile size ${imageFile.size / 1024 / 1024} MB`);
+            document.getElementById('originalSize').append(`${imageFile.size / 1024 / 1024} MB`);
+            document.getElementById('originalBlock').hidden = false;
+            const options = {
+                maxSizeMB: 5,
+                //maxWidthOrHeight: 1920,
+                useWebWorker: true,
+            }
+            try {
+                const compressedFile = await imageCompression(imageFile, options);
+                printImage(compressedFile, 'modified');
+                console.log('compressedFile instanceof Blob', compressedFile instanceof Blob); // true
+                console.log(`compressedFile size ${compressedFile.size / 1024 / 1024} MB`); // smaller than maxSizeMB
+                document.getElementById('modifiedSize').append(`${compressedFile.size / 1024 / 1024} MB`);
+                document.getElementById('modifiedBlock').hidden = false;
+            } catch (error) {
+                console.log(error);
+            }
+
+        }
+    </script>
+
+</head>
+
+<body>
+    <form>
+        <label for="picture">Take a picture of your face:</label>
+        <input type="file" name="picture" accept="image/jpeg" onchange="handleImageUpload(event)"/>
+    </form>
+    <div hidden="true" id="originalBlock"><b>Original</b>
+        <div id="originalSize"></div>
+        <img id="original" src="" style="width:500px;height:600px;" alt="To be loaded" />
+    </div>
+    <div hidden="true" id="modifiedBlock"><b>Modified</b>
+        <div id="modifiedSize"></div>
+        <img id="modified" src="" style="width:500px;height:600px;" alt="To be loaded" />
+    </div>
+
+</body>
+
+</html>
