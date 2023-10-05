@@ -15,6 +15,10 @@
         }
 
         async function handleImageUpload(event) {
+            document.getElementById('originalBlock').hidden = true;
+            document.getElementById('modifiedBlock').hidden = true;
+            document.getElementById('originalSize').replaceChildren();
+            document.getElementById('modifiedSize').replaceChildren();
 
             const imageFile = event.target.files[0];
             printImage(imageFile, 'original');
